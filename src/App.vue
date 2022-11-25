@@ -9,32 +9,35 @@ const input_content = ref('')
 const input_category = ref(null)
 
 const todos_asc = computed(() => todos.value.sort((a, b) => {
-  return a.createdAt - b.createdAt;
+  return b.createdAt - a.createdAt;
 }))
 
 //addTodo
 
-const addTodo = ()=>{
-  if(input_content.value.trim() ==="" || input_category ===null){
-    return 
-  }  
+const addTodo = () => {
+  if (input_content.value.trim() === "" || input_category === null) {
+    return
+  }
 
   todos.value.push({
-    content :input_content.value,
-    category:input_category.value,
-    done:false,
+    content: input_content.value,
+    category: input_category.value,
+    done: false,
     createdAt: new Date().getTime(),
   })
 
+  // remove filed data
 
+  input_content.value = '';
+  input_category.value = null;
 
 }
 
 // save todo
 
-watch(todos , (newVal)=>{
+watch(todos, (newVal) => {
   localStorage.setItem('todos', JSON.stringify(newVal));
-},{ deep : true })
+}, { deep: true })
 
 
 
@@ -51,6 +54,13 @@ onMounted(() => {
   name.value = localStorage.getItem('name') || '';
   todos.value = JSON.parse(localStorage.getItem('todos')) || [];
 })
+
+
+// removeTodo 
+
+const removeTodo = (todo) => {
+  todos.value = todos.value.filter(t => t !== todo)
+}
 
 
 </script>
@@ -96,28 +106,31 @@ onMounted(() => {
       </form>
     </section>
 
-   <!-- todo list -->
+    <!-- todo list -->
 
-   <section class="todo-list">
+    <section class="todo-list">
 
-    <h3>Todo list </h3>
+      <h3>Todo list </h3>
 
-    <div class="list">
-      <div v-for="todo in todos_asc" :class="`todo-item ${todo.done && 'done'}`" >
+      <div class="list">
+        <div v-for="todo in todos_asc" :class="`todo-item ${todo.done && 'done'}`">
           <label>
-            <input type="checkbox"  v-model="todo.done"/>
+            <input type="checkbox" v-model="todo.done" />
             <span :class="`bubble ${todo.category}`"> </span>
           </label>
 
-          <div class="todo_content">
+          <div class="todo-content">
             <input type="text" v-model="todo.content">
           </div>
 
-
+          <!-- delete todo  -->
+          <div class="actions">
+            <button class="delete" @click="removeTodo(todo)">Delete</button>
+          </div>
+        </div>
       </div>
-    </div>
 
-   </section>
+    </section>
 
   </main>
 
